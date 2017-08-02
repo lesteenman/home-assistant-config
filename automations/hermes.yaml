@@ -1,0 +1,87 @@
+- id: lights_movie_playing
+  alias: 'Hermes starts playing while lights are on'
+  trigger:
+    platform: state
+    entity_id: media_player.hermes
+    to: playing
+  condition:
+    condition: and
+    conditions:
+    - condition: template
+      value_template: >
+        {%- set type = states.media_player.hermes.attributes.media_content_type -%}
+        {{ type == 'movie' or type == 'tvshow' }}
+    - condition: template
+      value_template: >
+        {%- set min_brightness = 255 -%}
+        {%- for group in states.group -%}
+        {%- if group.object_id == 'living_room_lights' -%}
+        {%- for light in group.attributes.entity_id -%}
+        {%- for state in states -%}{%- if state.entity_id == light -%}
+        {%- if state.state != 'off' and state.attributes.brightness < min_brightness -%}
+        {%- set min_brightness = state.attributes.brightness -%}
+        {%- endif -%}
+        {%- endif -%}{%- endfor -%}
+        {%- endfor -%}
+        {%- endif -%}
+        {%- endfor -%}
+
+        {{ min_brightness > 150 }}
+  action:
+    - service: notify.personal_chat_erik
+      data_template:
+        message: 'Movie time, lights off!'
+    - service: light.turn_on
+      data:
+        entity_id: group.living_room_lights
+        brightness: 60
+    - service: light.turn_on
+      data:
+        entity_id: light.hallway_light
+        brightness: 90
+
+- id: lights_movie_paused
+  alias: 'Hermes pauses with dimmed lights'
+  trigger:
+    platform: state
+    entity_id: media_player.hermes
+    from: playing
+    to: paused
+  condition:
+    condition: and
+    conditions:
+    - condition: sun
+      after: sunset
+      before_offset: '00:60:00'
+    - condition: template
+      value_template: >
+        {%- set type = states.media_player.hermes.attributes.media_content_type -%}
+        {{ type == 'movie' or type == 'tvshow'}}
+    - condition: template
+      value_template: >
+        {%- set max_brightness = 0 -%}
+        {%- for group in states.group -%}
+        {%- if group.object_id == 'living_room_lights' -%}
+        {%- for light in group.attributes.entity_id -%}
+        {%- for state in states -%}{%- if state.entity_id == light -%}
+        {%- if state.state != 'off' and state.attributes.brightness > max_brightness -%}
+        {% set max_brightness = state.attributes.brightness -%}
+        {%- endif -%}
+        {%- endif -%}{%- endfor -%}
+        {%- endfor -%}
+        {%- endif -%}
+        {%- endfor -%}
+
+        {{ max_brightness < 200 }}
+  action:
+    - service: notify.personal_chat_erik
+      data:
+        message: 'Hermes paused, time for some light.'
+    - service: light.turn_on
+      data:
+        entity_id: group.living_room_lights
+        brightness: 180
+    - service: light.turn_on
+      data:
+        entity_id: light.hallway_light
+        brightness: 110

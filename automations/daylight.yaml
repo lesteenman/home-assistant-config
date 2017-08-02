@@ -1,0 +1,58 @@
+- id: lights_daylight_gone_home
+  alias: 'Daylight gone, people home'
+  trigger:
+    platform: sun
+    event: sunset
+    offset: '-00:35:00'
+  condition:
+    condition: and
+    conditions:
+      - condition: state
+        entity_id: group.home
+        state: 'home'
+      - condition: state
+        entity_id: group.living_room_lights
+        state: 'off'
+  action:
+    - service: notify.personal_chat_erik
+      data:
+        message: 'Lights should be turning on, since the sun has set! People are in the dark, sir!'
+    - event: sunset_lights
+
+- id: lights_homecoming_after_sunset
+  alias: 'First person comes home after sunset'
+  trigger:
+    platform: state
+    entity_id: group.home
+    to: 'home'
+  condition:
+    condition: and
+    conditions:
+    - condition: sun
+      after: sunset
+      before_offset: '00:40:00'
+    - condition: time
+      before: '23:30:00'
+  action:
+    - service: notify.personal_chat_erik
+      data_template:
+          message: >-
+            {%- for state in states if state.entity_id == trigger.entity_id -%}
+              "Switching on lights because {{ state.attributes.friendly_name }} came home after sunset."
+            {%- endfor -%}
+    - event: sunset_lights
+
+- id: night_lights
+  alias: 'Turn on lights when it gets dark'
+  trigger:
+    platform: event
+    event_type: sunset_lights
+  action:
+    - service: light.turn_on
+      data:
+        entity_id: group.living_room_lights
+        brightness: 200
+    - service: light.turn_on
+      data:
+        entity_id: light.hallway_light
+        brightness: 150

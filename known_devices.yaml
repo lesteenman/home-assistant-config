@@ -1,0 +1,81 @@
+a4773395e5c4:
+  hide_if_away: false
+  icon:
+  mac: !secret mac.hermes
+  name: Hermes
+  picture:
+  track: false
+  vendor: Google, Inc.
+
+00178825efe7:
+  hide_if_away: false
+  icon:
+  mac: !secret mac.hue
+  name: "Philips Hue"
+  picture:
+  track: false
+  vendor: Philips Lighting BV
+
+3cd92b255599:
+  hide_if_away: false
+  icon:
+  mac: !secret mac.laptop_shannon
+  name: "Laptop Shannon"
+  picture:
+  track: false
+  vendor: Hewlett Packard
+
+c0eefbe1c2d0:
+  hide_if_away: false
+  icon:
+  mac: !secret mac.scar
+  name: Scar
+  picture:
+  track: true
+  vendor: OnePlus Tech (Shenzhen) Ltd
+
+6045cb291014:
+  hide_if_away: true
+  icon:
+  mac: !secret mac.quasimodo
+  name: "Quasimodo"
+  picture:
+  track: true
+  vendor: ASUSTek COMPUTER INC.
+
+64bc0c814b93:
+  hide_if_away: false
+  icon:
+  mac: !secret mac.aether
+  name: "Aether"
+  picture:
+  track: false
+  vendor: LG Electronics (Mobile Communications)
+
+ploutonsteenman:
+  hide_if_away: false
+  icon:
+  mac: !secret mac.plouton
+  name: plouton.steenman
+  picture:
+  track: false
+  vendor: ASUSTek COMPUTER INC.
+
+6045cb2f9f85:
+  hide_if_away: true
+  icon:
+  mac: !secret mac.kronos
+  name: Kronos
+  picture:
+  track: true
+  vendor: ASUSTek COMPUTER INC.
+
+94652d80979b:
+  hide_if_away: false
+  icon:
+  mac: !secret mac.ouranos
+  name: "Ouranos"
+  picture:
+  gravatar: !secret email.erik
+  track: true
+  vendor: OnePlus Technology (Shenzhen) Co., Ltd

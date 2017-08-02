@@ -1,0 +1,30 @@
+- id: telegram_download_complete
+  alias: 'Telegram download completed'
+  trigger:
+    platform: event
+    event_type: telegram_download_complete
+  action:
+    service: notify.personal_chat_erik
+    data:
+      message: "{{trigger.event.event_data.filename}} has finished downloading."
+
+- id: amc_conversion_finished
+  alias: 'Finished converting file in AMC'
+  trigger:
+    platform: event
+    event_type: ams_conversion_finished
+  action:
+    service: notify.personal_chat_erik
+    data:
+      message: "{{trigger.event.event_data.filename}} has been converted to MP4."
+
+- id: amc_conversion_error
+  alias: 'AMC encountered error converting'
+  trigger:
+    platform: event
+    event_type: amc_conversion_error
+  action:
+    service: notify.personal_chat_erik
+    data:
+      message: "Error converting {{trigger.event.event_data.filename}} into MP4."
+

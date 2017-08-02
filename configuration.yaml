@@ -1,0 +1,154 @@
+homeassistant:
+  # Name of the location where Home Assistant is running
+  name: Home
+  # Location required to calculate the time the sun rises and sets
+  latitude: !secret gps.lat
+  longitude: !secret gps.lng
+  # Impacts weather/sunrise data (altitude above sea level in meters)
+  elevation: 1
+  # metric for Metric, imperial for Imperial
+  unit_system: metric
+  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  time_zone: Europe/Amsterdam
+
+zone: !include zones.yaml
+
+logger: !include logger.yaml
+
+# Show links to resources in log and frontend
+introduction:
+
+# Enables the frontend
+frontend:
+
+# Enables configuration UI
+config:
+
+http:
+  # Uncomment this to add a password (recommended!)
+  api_password: !secret http_password
+  # Uncomment this if you are using SSL or running in Docker etc
+  base_url: jarvis.home.steenman.me
+
+# Checks for available updates
+# Note: This component will send some information about your system to
+# the developers to assist with development of Home Assistant.
+# For more information, please see:
+# https://home-assistant.io/blog/2016/10/25/explaining-the-updater/
+updater:
+  # Optional, allows Home Assistant developers to focus on popular components.
+  # include_used_components: true
+
+# Discover some devices automatically
+discovery:
+
+# Allows you to issue voice commands from the frontend in enabled browsers
+conversation:
+
+# Enables support for tracking state changes over time.
+history:
+
+# View all events in a logbook
+logbook:
+
+# Track the sun
+sun:
+
+# mqtt:
+#   broker: !secret mqtt.host
+#   port: !secret mqtt.port
+#   certificate: auto
+#   username: !secret mqtt.username
+#   password: !secret mqtt.password
+#   protocol: 3.1.1
+
+# Weather Prediction
+sensor:
+  - platform: yr
+    name: "Weather"
+
+  - platform: transmission
+    host: !secret transmission.host
+    port: !secret transmission.port
+    username: !secret transmission.username
+    password: !secret transmission.password
+    name: "Transmission"
+    monitored_variables:
+      - current_status
+      - download_speed
+      # - upload_speed
+
+  - platform: systemmonitor
+    resources:
+      type: memory_free
+
+  - platform: fastdotcom
+    minute:
+      - 0
+      - 15
+      - 30
+      - 45
+
+  - platform: steam_online
+    api_key: !secret steam.api
+    accounts:
+      - !secret steam.erik
+      - !secret steam.shannon
+
+  - platform: plex
+
+ifttt:
+  key: !secret ifttt.api
+
+# Text to speech
+tts:
+  platform: google
+
+# Home presence with Android app
+device_tracker:
+  - platform: locative
+  - platform: nmap_tracker
+
+    # Enable once we're looking for new devices.
+    track_new_devices: no
+
+    hosts: 192.168.1.1/24
+    interval_seconds: 10
+    # Once someone is home, they will have to be gone for 15 minutes before actually being
+    # considered 'away'. Helps prevent false negatives.
+    consider_home: 900
+    # Scan only once every 3 minutes once someone is home.
+    # Note that these two options combined mean that it might take up to 18 minutes before someone is
+    # marked as not_home, which is no issue with my current setup.
+    home_interval: 180
+    exclude:
+      - 192.168.1.1
+      - 192.168.1.15
+
+# Spotify integration
+media_player:
+  - platform: spotify
+    client_id: !secret spotify.id
+    client_secret: !secret spotify.secret
+  - platform: cast
+
+telegram_bot:
+  - platform: polling
+    api_key: !secret telegram.api
+    allowed_chat_ids:
+      - !secret telegram.chat_ids.erik
+
+notify:
+  - platform: telegram
+    name: personal_chat_erik
+    chat_id: !secret telegram.chat_ids.erik
+
+input_select:
+  telegram_test:
+    name: "What do you want to test?"
+    options:
+      - "none"
+      - "keyboard"
+
+group: !include groups.yaml
+automation: !include_dir_merge_list automations

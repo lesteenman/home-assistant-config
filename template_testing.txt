@@ -1,0 +1,7 @@
+{%- set domains = [states.light, states.switch, states.automation, states.device_tracker, states.group, states.media_player, states.proximity, states.script, states.zone, states.zwave, states.binary_sensor, states.sensor, states.calendar ] %}
+{{ "Entity ID".ljust(50) }}  {{ "Entity Name" }}
+{%- for domain in domains %}
+{% for item in domain %}
+{{ item.entity_id.ljust(50) }} {{ item.name }}
+{%- endfor %}
+{%- endfor %}

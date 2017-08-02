@@ -1,0 +1,125 @@
+# - id: telegram_input_test
+#   alias: "Testing input selector to Telegram"
+#   trigger:
+#     platform: state
+#     entity_id: input_select.telegram_test
+#   action:
+#     service: notify.personal_chat_erik
+#     data_template:
+#       message: "Input switched to {{states.input_select.telegram_test.state}}"
+
+- id: telegram_keyboard_test
+  alias: "Testing inline keyboards on Telegram"
+  trigger:
+    - platform: state
+      entity_id: input_select.telegram_test
+      to: keyboard
+    - platform: event
+      event_type: jarvis_good_morning
+  action:
+    service: telegram_bot.send_message
+    data:
+      message: "Good morning, sir!"
+      inline_keyboard: [
+        "Good morning!:/morning_reply_yes",
+        # "Meh...:/morning_reply_no",
+        "Give me some music:/music_start"
+      ]
+
+- id: telegram_event
+  alias: "Received an event from Telegram"
+  trigger:
+    platform: event
+    event_type: telegram_callback
+    event_data:
+      data: '/morning_reply_yes'
+  action:
+    - service: telegram_bot.edit_message
+      data_template:
+        message_id: '{{ trigger.event.data.message.message_id }}'
+        chat_id: '{{ trigger.event.data.chat_id }}'
+        message: '{{ trigger.event.data.message.text }}'
+    - service: notify.personal_chat_erik
+      data_template:
+        message: "Excellent :)"
+
+# - id: telegram_event_2
+#   alias: "Received an event 2 from Telegram"
+#   trigger:
+#     platform: event
+#     event_type: telegram_callback
+#     event_data:
+#       data: '/morning_reply_no'
+#   action:
+#     - service: telegram_bot.edit_message
+#       data_template:
+#         message_id: '{{ trigger.event.data.message.message_id }}'
+#         chat_id: '{{ trigger.event.data.chat_id }}'
+#         message: '{{ trigger.event.data.message.text }}'
+#     - service: notify.personal_chat_erik
+#       data:
+#         message: "Well, isn't someone grumpy today."
+
+- id: telegram_event_play_music
+  alias: "Telegram request to play music on Hermes"
+  trigger:
+    platform: event
+    event_type: telegram_callback
+    event_data:
+      data: '/music_start'
+  action:
+    - service: telegram_bot.edit_message
+      data_template:
+        message_id: '{{ trigger.event.data.message.message_id }}'
+        chat_id: '{{ trigger.event.data.chat_id }}'
+        message: '{{ trigger.event.data.message.text }}'
+    - service: telegram_bot.send_message
+      data:
+        message: "All right. Playing some music on Hermes! Any preference for music?"
+        inline_keyboard: [
+          "This is fine\\, thank you.:/noop",
+          "Some greenday:/spotify_hermes_play-greenday",
+          "Awesome Mix Vol1+2!:/spotify_hermes_play-awesomemix",
+          "Let's see what's new:/spotify_hermes_play-releaseradar", # release radar
+          "Discover something new:/spotify_hermes_play-discoverweekly", # discover weekly
+        ]
+    - service: media_player.select_source
+      data:
+        entity_id: media_player.spotify
+        source: Hermes
+    - service: media_player.media_play
+      data:
+        entity_id: media_player.spotify
+
+- id: telegram_event_select_music
+  alias: "Telegram request for specific music playlist"
+  trigger:
+    platform: event
+    event_type: telegram_callback
+  condition:
+    condition: template
+    value_template: " {{ trigger.event.data.data[0:21] == '/spotify_hermes_play-' }} "
+  action:
+    - service: notify.personal_chat_erik
+      data_template:
+        message: " Request to play {{ trigger.event }} "
+    - service: telegram_bot.edit_message
+      data_template:
+        message_id: '{{ trigger.event.data.message.message_id }}'
+        chat_id: '{{ trigger.event.data.chat_id }}'
+        message: '{{ trigger.event.data.message.text }}'
+    - service: telegram_bot.send_message
+      data_template:
+        parse_mode: html
+        message: 'alright, playing {{ trigger.event.data.data[21:] }}!'
+
+- id: telegram_event_any
+  alias: "Received any event from Telegram"
+  trigger:
+    platform: event
+    event_type: telegram_callback
+  action:
+    service: telegram_bot.send_message
+    data_template:
+      parse_mode: html
+      message: "Received the following reply: {{ trigger.event.data.data[0:21] }}, list is {{trigger.event.data.data[21:]}}"

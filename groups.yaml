@@ -1,0 +1,27 @@
+presence:
+  name: 'Home or away'
+  view: true
+  entities:
+  - group.home
+
+shannon:
+  name: 'Shannon'
+  view: true
+  entities:
+    - 'device_tracker.c0eefbe1c2d0'
+    - 'device_tracker.df6965768b587bb2'
+erik:
+  - 'device_tracker.94652d80979b' # Ouranos
+  # - 'device_tracker.6045cb2f9f85' # Kronos
+home:
+  - group.shannon
+  - group.erik
+
+living_room_lights:
+  - light.small_living_room_light
+  - light.standing_reading_light
+
+automations:
+  name: 'Automations'
+  view: true
+  entities: group.all_automations

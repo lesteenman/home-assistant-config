@@ -1,0 +1,8 @@
+default: info
+logs:
+  homeassistant.core: error
+  homeassistant.components.device_tracker: warn
+  homeassistant.components.automation: debug
+  # homeassistant.components.http: warn
+  homeassistant.components.media_player: warn
+  plexapi: warn

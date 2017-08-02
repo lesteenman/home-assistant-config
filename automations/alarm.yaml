@@ -1,0 +1,43 @@
+- id: alarm_time
+  alias: 'Alarm started'
+  trigger:
+    platform: event
+    event_type: alarm_time
+  action:
+    service: notify.personal_chat_erik
+    data:
+      message: "Good morning sir!"
+
+- id: alarm_time2
+  alias: 'Alarm killed'
+  trigger:
+    platform: event
+    event_type: alarm_time2
+  action:
+    - service: notify.personal_chat_erik
+      data:
+        message: "Good morning2 sir! Remember to set up living room lights once it gets dark in the mornings again."
+    - event: jarvis_good_morning
+
+- id: sleep_time
+  alias: 'Bedtime according to Sleep as Android'
+  trigger:
+    platform: event
+    event_type: sleep_time
+  condition:
+    - condition: and
+      conditions:
+        - condition: state
+          entity_id: group.erik
+          state: 'home'
+        - condition: state
+          entity_id: group.lights_all
+          state: 'on'
+  action:
+    - service: notify.personal_chat_erik
+      data:
+        message: "Have a good night, sir!"
+    - service: light.turn_on
+      data:
+        entity_id: group.all_lights
+        brightness: 120
